@@ -34,7 +34,8 @@ impl Board {
         }
     }
 
-    pub fn print_board(&self) {
+    pub fn print_board(&mut self) {
+        println!("\nUnsolved Board");
         for (row, line) in self.board.iter().enumerate() {
             // print a horizontal line every 3 rows
             if row % 3 == 0 && row != 0 {
@@ -53,6 +54,61 @@ impl Board {
             // print a newline after each row
             println!();
         }
+
+        if self.solver() {
+            self.print_solved_board();
+        } else {
+            self.solver();
+        }
+    }
+
+    pub fn print_solved_board(&self) {
+        println!("\nSolved Board");
+        for (row, line) in self.board.iter().enumerate() {
+            if row % 3 == 0 && row != 0 {
+                println!("------+-------+------");
+            }
+
+            for (col, num) in line.iter().enumerate() {
+                if col % 3 == 0 && col != 0 {
+                    print!("| ");
+                }
+
+                print!("{} ", num);
+            }
+
+            println!();
+        }
+    }
+
+    pub fn solver(&mut self) -> bool {
+        // backtracking algorithm
+
+        // find the first empty cell
+        // if there are no empty cells, return true
+        // for each number from 1 to 9
+        // if the number is valid in the cell
+        // set the cell to the number
+        //
+
+        for row in 0..9 {
+            for column in 0..9 {
+                if self.board[column][row] == 0 {
+                    for number in 1..10 {
+                        self.board[column][row] = number;
+                        // validity check
+                        if self.solver() {
+                            return true;
+                        }
+                        // undo move if not valid
+                    }
+
+                    return false;
+                }
+            }
+        }
+
+        true
     }
 }
 
