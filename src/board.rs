@@ -81,6 +81,34 @@ impl Board {
         }
     }
 
+    pub fn is_valid(&mut self, number: u32, column: usize, row: usize) -> bool {
+        // check if the same number is in the same column
+        if self.board[column].contains(&number) {
+            return false;
+        }
+
+        // check if the same number is in the same row
+        for i in 0..9 {
+            if self.board[i][row] == number {
+                return false;
+            }
+        }
+
+        // check if the same number is in the same box
+        let box_x = column / 3;
+        let box_y = row / 3;
+
+        for i in 0..3 {
+            for j in 0..3 {
+                if self.board[box_x * 3 + i][box_y * 3 + j] == number {
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
+
     pub fn solver(&mut self) -> bool {
         // backtracking algorithm
 
@@ -89,18 +117,20 @@ impl Board {
         // for each number from 1 to 9
         // if the number is valid in the cell
         // set the cell to the number
-        //
 
         for row in 0..9 {
             for column in 0..9 {
                 if self.board[column][row] == 0 {
                     for number in 1..10 {
-                        self.board[column][row] = number;
-                        // validity check
-                        if self.solver() {
-                            return true;
+                        if self.is_valid(number, column, row) {
+                            self.board[column][row] = number;
+
+                            if self.solver() {
+                                return true;
+                            }
+
+                            self.board[column][row] = 0;
                         }
-                        // undo move if not valid
                     }
 
                     return false;
@@ -132,5 +162,13 @@ mod tests {
         assert_eq!(board.board[0][0], 5);
         assert_eq!(board.board[2][3], 0);
         assert_eq!(board.board[8][8], 9);
+    }
+
+    #[test]
+    fn solver() {
+        let mut board = Board::new();
+        board.read_from_file("board.txt");
+
+        assert_eq!(board.solver(), true);
     }
 }
